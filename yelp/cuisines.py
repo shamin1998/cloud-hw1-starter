@@ -1,9 +1,1 @@
-# CUISINES = ['chinese', 'italian', 'american', 'japanese'] 
-
-# --- above already added --- #
-
-# CUISINES = ['korean', 'indian'] 
-
-# --- above already added --- #
-
-CUISINES = ['mexican'] 
+CUISINES = ['chinese', 'italian', 'american', 'japanese', 'korean', 'indian', 'mexican'] 
