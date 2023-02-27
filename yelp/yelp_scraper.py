@@ -3,6 +3,7 @@ import json
 from decimal import Decimal
 import csv
 import cuisines
+from datetime import datetime
 
 API_KEY = 'JpSiYrHh43GV_9dyyIeCWPBl1Uw5f6v61qlOMbfB4vjk01JZFAo4lskcpomNJ5ZuzIACvIUNqg8Fk_rvBw-_3o9rY1Hxp4Hmi5CJiIGpWMY-ItLuKMk8jRDWnpL5Y3Yx'
 
@@ -33,11 +34,12 @@ def get_restaurants(cuisine_type):
                     'longitude': Decimal(str(business['coordinates']['longitude'])),
                     'review_count': business['review_count'],
                     'rating': Decimal(str(business['rating'])),
-                    'zip_code': business['location']['zip_code']
+                    'zip_code': business['location']['zip_code'],
+                    'insertedAtTimestamp': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
                 })
 
     with open('data/%s_restaurants.csv' % cuisine_type, mode='w', encoding='utf-8', newline='') as csv_file:
-        fieldnames = ['id', 'name', 'address', 'latitude', 'longitude', 'review_count', 'rating', 'zip_code']
+        fieldnames = ['id', 'name', 'address', 'latitude', 'longitude', 'review_count', 'rating', 'zip_code', 'insertedAtTimestamp']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
         for restaurant in restaurants:
