@@ -10,7 +10,7 @@ def insert_restaurants(cuisine_type):
     table = dynamodb.Table('yelp_restaurants')
 
     # Open the CSV file for reading
-    with open('data/%s_restaurants.csv' % cuisine_type, 'r', encoding='utf-8') as csvfile:
+    with open('data/csvs/%s_restaurants.csv' % cuisine_type, 'r', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             # Insert each row into the DynamoDB table
