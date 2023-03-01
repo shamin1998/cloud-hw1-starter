@@ -12,12 +12,24 @@ def search_restaurants(cuisine):
     host = 'search-restaurants-nymmlgvcnnff4nmtkpilurupiy.us-east-1.es.amazonaws.com'
     index = 'restaurants'
     query = {
-        'size': 5,
-        'query': {
-            'multi_match': {
-                'query': cuisine
+        "size": 1,
+        "query": {
+            "function_score": {
+                "query": {
+                    "term": {
+                        "cuisine.keyword": {
+                            "value": cuisine
+                        }
+                    }
+                },
+                "functions": [
+                    {
+                        "random_score": {}
+                    }
+                ]
             }
-        }
+        },
+        "_source": "id"
     }
 
     # Make the signed HTTP request
