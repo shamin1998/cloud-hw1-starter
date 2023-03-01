@@ -58,7 +58,11 @@ $(document).ready(function() {
           var messages = data.messages;
 
           for (var message of messages) {
-            if (message.type === 'unstructured') {
+            
+            if (message.contentType === 'PlainText') {
+              console.log('BotResponse content : ' + message.content);
+              insertResponseMessage(message.content);
+            } else if (message.type === 'unstructured') {
               insertResponseMessage(message.unstructured.text);
             } else if (message.type === 'structured' && message.structured.type === 'product') {
               var html = '';
@@ -78,12 +82,12 @@ $(document).ready(function() {
             }
           }
         } else {
-          insertResponseMessage('Oops, something went wrong. Please try again.');
+          insertResponseMessage(JSON.stringify(data));
         }
       })
       .catch((error) => {
         console.log('an error occurred', error);
-        insertResponseMessage('Oops, something went wrong. Please try again.');
+        insertResponseMessage('ERROR!!!');
       });
   }
 
