@@ -62,7 +62,6 @@ def lambda_handler(event, context):
     if "NumPeople" in message["MessageAttributes"].keys():
         numOfPeople = message["MessageAttributes"]["NumPeople"]["StringValue"]
     email = message["MessageAttributes"]["Email"]["StringValue"]
-    email = "+1" + email
     if not cuisine or not email:
         logger.debug("No Cuisine or PhoneNum key found in message")
         return
