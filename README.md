@@ -1,4 +1,6 @@
 # Chatbot Concierge #
+Brian Chen: bwc2120
+Shamin Aggarwal: sa4129
 
 ## About ##
 
