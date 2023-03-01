@@ -53,12 +53,13 @@ $(document).ready(function() {
         var data = response.data;
 
         if (data.messages && data.messages.length > 0) {
-          console.log('received ' + data.messages.length + ' messages');
+          console.log('RECEIVED ' + data.messages.length + ' messages');
 
           var messages = data.messages;
 
           for (var message of messages) {
-            
+            console.log('logging message');
+            console.log(message);
             if (message.contentType === 'PlainText') {
               console.log('BotResponse content : ' + message.content);
               insertResponseMessage(message.content);
