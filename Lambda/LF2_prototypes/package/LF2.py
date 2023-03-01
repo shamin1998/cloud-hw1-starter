@@ -8,43 +8,57 @@ service = 'es'
 credentials = boto3.Session().get_credentials()
 awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service, session_token=credentials.token)
 
-host = 'https://search-restaurants-nymmlgvcnnff4nmtkpilurupiy.us-east-1.es.amazonaws.com' 
-# The OpenSearch domain endpoint with https:// and without a trailing slash
-index = 'restaurants'
-url = host + '/' + index + '/_search'
+def search_restaurants(cuisine):
+    host = 'search-restaurants-nymmlgvcnnff4nmtkpilurupiy.us-east-1.es.amazonaws.com'
+    index = 'restaurants'
+    query = {
+        'size': 5,
+        'query': {
+            'multi_match': {
+                'query': cuisine
+            }
+        }
+    }
+
+    # Make the signed HTTP request
+    os = OpenSearch(
+        hosts=[{'host': host, 'port': 443}],
+        http_auth=awsauth,
+        use_ssl=True,
+        verify_certs=True,
+        connection_class=RequestsHttpConnection
+    )
+
+    res = os.search(index=index, body=query)
+    hits = res['hits']['hits']
+    results = [hit['_source'] for hit in hits]
+    ids = [result['id'] for result in results]
+    
+    return ids
+
+def search_dynamo(ids):
+    dynamodb = boto3.resource('dynamodb')
+    table_name = 'yelp_restaurants'
+    table = dynamodb.Table(table_name)
+
+    restaurant_data = []
+    for id in ids:
+        response = table.get_item(
+            Key={
+                'id': id
+            }
+        )
+        
+        restaurant_data.append(response['Item'])
+    
+    return restaurant_data
 
 # Lambda execution starts here
 def lambda_handler(event, context):
+    cuisine = event['cuisine']
+    restaurant_data = search_dynamo(search_restaurants(cuisine))
 
-    # Put the user query into the query DSL for more accurate search results.
-    # Note that certain fields are boosted (^).
-    cuisine = 'chinese'
-    query = {'size': 5, 'query': {'multi_match': {'query': cuisine}}}
-
-    # Make the signed HTTP request
-    client = OpenSearch(hosts=[{
-        'host': host,
-        'port': 443
-    }],
-                        http_auth=awsauth,
-                        use_ssl=True,
-                        verify_certs=True,
-                        connection_class=RequestsHttpConnection)
-    res = client.search(index=index, body=query)
-    hits = res['hits']['hits']
-    results = []
-    for hit in hits:
-        results.append(hit['_source'])
-
-    # Create the response and add some extra content to support CORS
-    response = {
-        "statusCode": 200,
-        "headers": {
-            "Access-Control-Allow-Origin": '*'
-        },
-        "isBase64Encoded": False
+    return {
+        'statusCode': 200,
+        'body': restaurant_data
     }
-
-    # Add the search results to the response
-    response['body'] = [result['id'] for result in results]
-    return response
